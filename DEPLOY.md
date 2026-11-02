@@ -271,6 +271,8 @@ http://YOUR_SERVER_IP:8080
 
 ## 🛠️ Quick Troubleshooting Guide
 
+For a full step-by-step resolution for **502 Bad Gateway** or connection issues, see [`fixes.md`](./fixes.md).
+
 ### 1. `EACCES: permission denied, mkdir '/workspace/erpnext-source/node_modules'` or yarn error
 **Cause:** Host files mounted as root instead of user `frappe` (UID 1000).  
 **Fix:** Run on the server:

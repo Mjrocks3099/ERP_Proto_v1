@@ -17,7 +17,12 @@ if [ ! -f "$PROCFILE" ]; then
     exec sleep infinity
 fi
 
-echo "[cephlon-start] Procfile found. Starting bench..."
+echo "[cephlon-start] Ensuring web server binds to 0.0.0.0..."
+sed -i 's/bench serve  *--port 8000/bench serve --host 0.0.0.0 --port 8000/' "$PROCFILE"
+if ! grep -q -- "--host 0.0.0.0" "$PROCFILE"; then
+    sed -i 's/bench serve/bench serve --host 0.0.0.0/' "$PROCFILE"
+fi
+
+echo "[cephlon-start] Procfile ready. Starting bench..."
 cd "$BENCH_DIR"
 exec bench start
-

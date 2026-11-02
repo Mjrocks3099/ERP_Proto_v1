@@ -1,6 +1,6 @@
 # Cephlon ERP — Server Deployment Guide (IP + Port)
 
-Access the app at:  **`http://YOUR_SERVER_IP:8080`**
+Access the app at:  **`http://YOUR_SERVER_IP:3011`**
 
 No domain name or HTTPS needed.
 
@@ -14,7 +14,7 @@ First run (bench not initialized):
   → You fix permissions (chown to frappe:frappe)
   → You run bench init steps
   → docker compose restart frappe
-  → frappe-start.sh → Procfile FOUND → bench start ✅
+  → frappe-start.sh → binds 0.0.0.0 → bench start ✅
 
 Every restart after that:
   frappe-start.sh → Procfile FOUND → bench start ✅ (fully automatic)
@@ -28,9 +28,9 @@ Every restart after that:
 Browser
    │
    ▼
-http://YOUR_SERVER_IP:8080
+http://YOUR_SERVER_IP:3011
    │
-Nginx (port 8080 → internal 80)
+Nginx (port 3011 → internal 80)
    │
    ├──▶ Frappe web process :8000  ◀──▶  MariaDB :3306
    │              │
@@ -45,10 +45,10 @@ Nginx (port 8080 → internal 80)
 
 | File | Purpose |
 |---|---|
-| [`docker-compose.yml`](./docker-compose.yml) | All services — Nginx exposes port `8080`, Frappe runs with `user: frappe` |
-| [`frappe-start.sh`](./frappe-start.sh) | Smart startup — waits for bench init, then runs `bench start` |
+| [`docker-compose.yml`](./docker-compose.yml) | All services — Nginx exposes port `3011`, Frappe runs with `user: frappe` |
+| [`frappe-start.sh`](./frappe-start.sh) | Smart startup — binds `0.0.0.0:8000` and auto-starts bench |
 | [`nginx/default.conf`](./nginx/default.conf) | Reverse proxy — `server_name _` accepts any IP |
-| [`.env.example`](./.env.example) | Copy to `.env` and set DB password |
+| [`.env.example`](./.env.example) | Copy to `.env` and set DB password and HTTP_PORT |
 | [`erpnext/hooks.py`](./erpnext/hooks.py) | App config, CSS/JS version cache busting |
 | [`erpnext/public/css/cephlon-dashboard-panel.css`](./erpnext/public/css/cephlon-dashboard-panel.css) | Navbar/sidebar dark theme |
 | [`erpnext/public/js/cephlon-dashboard-home.js`](./erpnext/public/js/cephlon-dashboard-home.js) | Branding JS |
@@ -113,11 +113,11 @@ MARIADB_ROOT_PASSWORD=YourStrongPassword123!
 
 ---
 
-## Step 4 — Open Port 8080 in Firewall
+## Step 4 — Open Port 3011 in Firewall
 
 ```bash
 sudo ufw allow OpenSSH
-sudo ufw allow 8080/tcp
+sudo ufw allow 3011/tcp
 sudo ufw enable
 sudo ufw status
 ```
@@ -188,6 +188,9 @@ bench set-config -g db_host mariadb
 bench set-config -g redis_cache    redis://redis-cache:6379
 bench set-config -g redis_queue    redis://redis-queue:6379
 bench set-config -g redis_socketio redis://redis-queue:6379
+
+# 6. Bind web server to 0.0.0.0 so Nginx can reach it
+sed -i 's/bench serve  *--port 8000/bench serve --host 0.0.0.0 --port 8000/' /workspace/bench/Procfile
 ```
 
 ---
@@ -208,6 +211,7 @@ bench new-site 192.168.1.100 \
   --mariadb-user-host-login-scope='%'
 
 bench --site 192.168.1.100 install-app erpnext
+bench set-config -g default_site 192.168.1.100
 bench --site 192.168.1.100 set-config developer_mode 0
 bench --site 192.168.1.100 clear-cache
 ```
@@ -251,7 +255,7 @@ You should see bench starting (web server on `:8000`, worker, socketio).
 Check with curl:
 
 ```bash
-curl -I http://localhost:8080
+curl -I http://localhost:3011
 ```
 
 ---
@@ -261,7 +265,7 @@ curl -I http://localhost:8080
 Open in your browser:
 
 ```
-http://YOUR_SERVER_IP:8080
+http://YOUR_SERVER_IP:3011
 ```
 
 - **Username:** `Administrator`

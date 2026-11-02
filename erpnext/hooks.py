@@ -51,10 +51,10 @@ app_include_js = "erpnext.bundle.js"
 app_include_css = [
 	"erpnext.bundle.css",
 	"/assets/erpnext/css/cephlon-raleway.css?v=1",
-	"/assets/erpnext/css/cephlon-dashboard-panel.css?v=13",
-	"/assets/erpnext/css/cephlon-dashboard-home.css?v=12",
+	"/assets/erpnext/css/cephlon-dashboard-panel.css?v=14",
+	"/assets/erpnext/css/cephlon-dashboard-home.css?v=14",
 ]
-app_include_js = ["erpnext.bundle.js", "/assets/erpnext/js/cephlon-dashboard-home.js?v=12"]
+app_include_js = ["erpnext.bundle.js", "/assets/erpnext/js/cephlon-dashboard-home.js?v=17"]
 web_include_css = [
 	"erpnext-web.bundle.css",
 	"/assets/erpnext/css/cephlon-raleway.css?v=1",

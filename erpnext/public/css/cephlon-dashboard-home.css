@@ -3,6 +3,15 @@
 	display: none !important;
 }
 
+/* Prevent the unbranded Frappe workspace from flashing during SPA navigation. */
+body:not(.cephlon-ui-ready) .layout-main-section {
+	visibility: hidden !important;
+}
+
+body.cephlon-ui-ready .layout-main-section {
+	visibility: visible !important;
+}
+
 .cephlon-hide-erpnext-brand {
 	display: none !important;
 }

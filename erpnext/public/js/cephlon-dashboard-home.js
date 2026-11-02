@@ -1,4 +1,9 @@
 (() => {
+	const markUiReady = () => document.body?.classList.add("cephlon-ui-ready");
+	const markUiLoading = () => document.body?.classList.remove("cephlon-ui-ready");
+
+	markUiLoading();
+
 	const isDeskRoute = () => {
 		const path = window.location.pathname;
 		return path.startsWith("/desk") || path.startsWith("/app");
@@ -65,6 +70,19 @@
 		});
 	};
 
+	const watchTutorialMediaDuringMount = (main) => {
+		if (main.dataset.cephlonTutorialWatch === "active") return;
+
+		main.dataset.cephlonTutorialWatch = "active";
+		const observer = new MutationObserver(() => hideErpnextTutorials(main));
+		observer.observe(main, { childList: true, subtree: true });
+
+		window.setTimeout(() => {
+			observer.disconnect();
+			delete main.dataset.cephlonTutorialWatch;
+		}, 4000);
+	};
+
 	const replaceFrappeBranding = () => {
 		document.querySelectorAll(
 			"[data-app-name='frappe'], [data-app='frappe'], [data-app-name='framework']"
@@ -92,15 +110,23 @@
 	};
 
 	const renderCephlonHome = () => {
-		if (!isDeskRoute()) return;
+		if (!isDeskRoute()) {
+			markUiReady();
+			return;
+		}
 
 		const main = document.querySelector(".layout-main-section");
-		if (!main) return;
+		if (!main) {
+			/* /desk is the app launcher and has no workspace main section. */
+			markUiReady();
+			return;
+		}
 
 		replaceFrappeBranding();
 		markCephlonRail();
 		replaceVisibleErpnextText(main);
 		hideErpnextTutorials(main);
+		watchTutorialMediaDuringMount(main);
 		if (!isBannerRoute()) {
 			main.querySelector(".cephlon-home-banner")?.remove();
 			return;
@@ -125,9 +151,30 @@
 
 			main.prepend(banner);
 		}
+
+		markUiReady();
 	};
 
-	const scheduleRender = () => window.setTimeout(renderCephlonHome, 250);
+	let renderFrame;
+	let retryCount = 0;
+
+	const scheduleRender = () => {
+		window.cancelAnimationFrame(renderFrame);
+		renderFrame = window.requestAnimationFrame(() => {
+			const before = document.querySelector(".layout-main-section");
+			renderCephlonHome();
+
+			/* Frappe mounts tutorial media after the workspace text. Retry a few
+			   times while the route settles so only the late video panel is removed;
+			   never run a live observer. */
+			if ((!before || retryCount < 4) && retryCount < 5) {
+				retryCount += 1;
+				window.setTimeout(scheduleRender, 100);
+			} else {
+				retryCount = 0;
+			}
+		});
+	};
 
 	if (document.readyState === "loading") {
 		document.addEventListener("DOMContentLoaded", scheduleRender, { once: true });
@@ -136,6 +183,10 @@
 	}
 
 	if (window.frappe?.router?.on) {
-		frappe.router.on("change", scheduleRender);
+		frappe.router.on("change", () => {
+			retryCount = 0;
+			markUiLoading();
+			scheduleRender();
+		});
 	}
 })();

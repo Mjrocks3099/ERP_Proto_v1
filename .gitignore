@@ -24,3 +24,6 @@ node_modules/
 erpnext/public/banking
 erpnext/www/banking.html
 .env
+
+.venv/
+erpnext/public/dist/

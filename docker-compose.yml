@@ -31,7 +31,7 @@ services:
     image: frappe/bench:latest
     restart: unless-stopped
     working_dir: /workspace/bench
-    command: sleep infinity
+    command: bash -lc "cd /workspace/bench && bench start"
     depends_on:
       - mariadb
       - redis-cache

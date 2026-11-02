@@ -313,6 +313,61 @@ body .cephlon-rail [data-label*="All app"]::before {
 	display: none !important;
 }
 
+/* Use the orange brand color on the icon itself instead of a hover box. */
+body .cephlon-rail a:hover,
+body .cephlon-rail button:hover {
+	border-color: transparent !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: #f79630 !important;
+}
+
+body .cephlon-rail a:hover svg,
+body .cephlon-rail button:hover svg,
+body .cephlon-rail a:hover .icon,
+body .cephlon-rail button:hover .icon {
+	color: #f79630 !important;
+	fill: none !important;
+	stroke: #f79630 !important;
+}
+
+/* Module hover is applied to the parent wrapper in Frappe's rail. */
+
+/* Module navigation uses only an orange icon and slim active rail marker. */
+body .cephlon-rail .active,
+body .cephlon-rail .selected,
+body .cephlon-rail [aria-current="page"],
+body .cephlon-rail [data-active="true"] {
+	border-color: transparent !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: #f79630 !important;
+}
+
+body .cephlon-rail .active svg,
+body .cephlon-rail .selected svg,
+body .cephlon-rail [aria-current="page"] svg,
+body .cephlon-rail [data-active="true"] svg,
+body .cephlon-rail .active .icon,
+body .cephlon-rail .selected .icon,
+body .cephlon-rail [aria-current="page"] .icon,
+body .cephlon-rail [data-active="true"] .icon {
+	color: #f79630 !important;
+	fill: none !important;
+	stroke: #f79630 !important;
+}
+
+body .cephlon-rail .active::before,
+body .cephlon-rail .selected::before,
+body .cephlon-rail [aria-current="page"]::before,
+body .cephlon-rail [data-active="true"]::before {
+	display: block !important;
+	left: 0 !important;
+	width: 3px !important;
+	background: #f79630 !important;
+	box-shadow: none !important;
+}
+
 /* Frappe places these four utility buttons in a wider internal wrapper.
    Offset only those wrappers so their SVGs align with the module icons. */
 body .cephlon-rail [aria-label*="Search"],

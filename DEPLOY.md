@@ -222,15 +222,27 @@ exit
 
 ## Step 9 — Build Frontend Assets
 
-Run from the host:
+Frappe will compile bundles and link all static assets (including your Cephlon theme, logo, and styles).
+
+Run from the host server:
 
 ```bash
+# Recommended: Build assets skipping yarn sub-app (avoids banking/vite issues)
 docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench build --app erpnext"
+  "cd /workspace/bench && bench build --app erpnext --no-yarn"
 
 docker compose exec --user frappe -T frappe bash -lc \
   "cd /workspace/bench && bench --site 192.168.1.100 clear-cache"
 ```
+
+> **Note on `ERROR: yarn build failed for erpnext`:**
+> ERPNext includes an experimental `banking` React/Vite sub-app that tries to run `yarn build`. Your Cephlon custom navbar, dashboard banner, and login page do **not** use Vite; they are standard assets linked directly. Passing `--no-yarn` builds all your custom themes and assets immediately without needing Vite.
+>
+> If you ever want to build the banking sub-app as well:
+> ```bash
+> docker compose exec --user frappe -T frappe bash -lc \
+>   "cd /workspace/erpnext-source/banking && yarn install && yarn build"
+> ```
 
 ---
 
@@ -288,6 +300,14 @@ sudo chown -R 1000:1000 /opt/cephlon/erpnext
 docker compose exec --user root frappe bash -c "chown -R frappe:frappe /workspace/bench"
 ```
 
+### 4. `ERROR: yarn build failed for erpnext` / `ENOENT: no such file or directory open '/sites/common_site_config.json'`
+**Cause:** ERPNext's `banking` subfolder runs Vite and tries to read `/sites/common_site_config.json` before it exists. Your Cephlon customizations (navbar, colors, banners, logo) do not require Vite at all.  
+**Fix:** Run with the `--no-yarn` flag:
+```bash
+docker compose exec --user frappe -T frappe bash -lc \
+  "cd /workspace/bench && bench build --app erpnext --no-yarn"
+```
+
 ---
 
 ## Deploying Future Updates
@@ -296,9 +316,9 @@ docker compose exec --user root frappe bash -c "chown -R frappe:frappe /workspac
 cd /opt/cephlon/erpnext
 git pull origin main
 
-# Rebuild assets and clear cache
+# Rebuild assets and clear cache (use --no-yarn to avoid banking/vite errors)
 docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench build --app erpnext && bench --site 192.168.1.100 clear-cache"
+  "cd /workspace/bench && bench build --app erpnext --no-yarn && bench --site 192.168.1.100 clear-cache"
 
 # If Python/Doctype changes occurred:
 docker compose exec --user frappe -T frappe bash -lc \

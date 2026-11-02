@@ -30,6 +30,7 @@ services:
   frappe:
     image: frappe/bench:latest
     restart: unless-stopped
+    user: frappe
     working_dir: /workspace/bench
     command: bash -lc "/workspace/erpnext-source/frappe-start.sh"
     depends_on:

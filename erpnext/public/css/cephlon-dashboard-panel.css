@@ -1,16 +1,26 @@
 /* Cephlon gradient for the narrow C-dot Desk navigation rail. */
 body .desk-sidebar,
-body [data-component="DeskSidebar"] {
+body [data-component="DeskSidebar"],
+body .cephlon-rail {
 	position: relative;
 	min-height: 100vh;
+	width: 64px !important;
+	min-width: 64px !important;
+	max-width: 64px !important;
 	background: linear-gradient(180deg, #18263e 0%, #0f1b2d 58%, #0b1424 100%) !important;
 	color: #ffffff !important;
 	border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: center !important;
+	padding-bottom: 12px !important;
+	overflow: visible !important;
 }
 
 /* Nested rail wrappers must stay transparent or they cover the gradient. */
 body .desk-sidebar *,
-body [data-component="DeskSidebar"] * {
+body [data-component="DeskSidebar"] *,
+body .cephlon-rail * {
 	background-color: transparent !important;
 	color: rgba(255, 255, 255, 0.78) !important;
 }
@@ -22,7 +32,11 @@ body .desk-sidebar svg,
 body [data-component="DeskSidebar"] a,
 body [data-component="DeskSidebar"] button,
 body [data-component="DeskSidebar"] .icon,
-body [data-component="DeskSidebar"] svg {
+body [data-component="DeskSidebar"] svg,
+body .cephlon-rail a,
+body .cephlon-rail button,
+body .cephlon-rail .icon,
+body .cephlon-rail svg {
 	color: rgba(255, 255, 255, 0.78) !important;
 	fill: currentColor;
 	stroke: currentColor;
@@ -47,6 +61,46 @@ body [data-component="DeskSidebar"] [data-active="true"] {
 	background: rgba(247, 150, 48, 0.16) !important;
 	box-shadow: 0 0 0 2px rgba(247, 150, 48, 0.16) !important;
 	color: #f79630 !important;
+}
+
+body .cephlon-rail a:hover,
+body .cephlon-rail button:hover,
+body .cephlon-rail .active,
+body .cephlon-rail .selected,
+body .cephlon-rail [aria-current="page"],
+body .cephlon-rail [data-active="true"] {
+	position: relative;
+	border: 1px solid rgba(247, 150, 48, 0.72) !important;
+	border-radius: 8px;
+	background: rgba(247, 150, 48, 0.16) !important;
+	box-shadow: 0 0 0 2px rgba(247, 150, 48, 0.16) !important;
+	color: #f79630 !important;
+}
+
+body .cephlon-rail .active::before,
+body .cephlon-rail .selected::before,
+body .cephlon-rail [aria-current="page"]::before,
+body .cephlon-rail [data-active="true"]::before {
+	position: absolute;
+	top: 7px;
+	bottom: 7px;
+	left: -1px;
+	width: 3px;
+	border-radius: 0 3px 3px 0;
+	background: #f79630 !important;
+	content: "";
+}
+
+/* Wider workspace menu: keep its clean surface, but mark the selected entry orange. */
+body .layout-side-section .standard-sidebar-item:hover,
+body .layout-side-section .standard-sidebar-item.active,
+body .layout-side-section .standard-sidebar-item.selected,
+body .layout-side-section .standard-sidebar-item[aria-current="page"] {
+	border: 1px solid rgba(247, 150, 48, 0.7) !important;
+	border-radius: 8px;
+	background: rgba(247, 150, 48, 0.1) !important;
+	box-shadow: 0 0 0 2px rgba(247, 150, 48, 0.1) !important;
+	color: #d97816 !important;
 }
 
 body .desk-sidebar .active::before,
@@ -129,4 +183,131 @@ body .awesomplete > input:focus,
 body .data-table input:focus {
 	border-color: #f79630 !important;
 	box-shadow: 0 0 0 3px rgba(247, 150, 48, 0.16) !important;
+}
+
+/* ─── Navbar / Rail size & icon improvements ────────────────────────────── */
+
+/* Make the rail wider so icons and the avatar are never clipped */
+body .cephlon-rail,
+body .desk-sidebar,
+body [data-component="DeskSidebar"] {
+	width: 64px !important;
+	min-width: 64px !important;
+	flex-shrink: 0 !important;
+	overflow: visible !important;
+}
+
+/* Bigger icons inside the rail */
+body .cephlon-rail svg,
+body .cephlon-rail .icon,
+body .desk-sidebar svg,
+body .desk-sidebar .icon,
+body [data-component="DeskSidebar"] svg,
+body [data-component="DeskSidebar"] .icon {
+	width: 22px !important;
+	height: 22px !important;
+	min-width: 22px !important;
+	min-height: 22px !important;
+}
+
+/* Bigger clickable icon buttons (hit area) */
+body .cephlon-rail a,
+body .cephlon-rail button,
+body .desk-sidebar a,
+body .desk-sidebar button,
+body [data-component="DeskSidebar"] a,
+body [data-component="DeskSidebar"] button {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	width: 44px !important;
+	height: 44px !important;
+	border-radius: 10px !important;
+}
+
+/* Navbar-home logo — make it larger and properly centred */
+body .cephlon-rail .navbar-home,
+body .desk-sidebar .navbar-home,
+body [data-component="DeskSidebar"] .navbar-home {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	width: 100% !important;
+	height: 56px !important;
+	padding: 0 !important;
+	margin-bottom: 4px !important;
+}
+
+body .cephlon-rail .navbar-home img,
+body .cephlon-rail .navbar-home .app-logo,
+body .cephlon-rail .navbar-home svg,
+body .desk-sidebar .navbar-home img,
+body .desk-sidebar .navbar-home .app-logo,
+body .desk-sidebar .navbar-home svg,
+body [data-component="DeskSidebar"] .navbar-home img,
+body [data-component="DeskSidebar"] .navbar-home .app-logo,
+body [data-component="DeskSidebar"] .navbar-home svg {
+	width: 36px !important;
+	height: 36px !important;
+	min-width: 36px !important;
+	min-height: 36px !important;
+	object-fit: contain !important;
+}
+
+/* ─── Administrator / User avatar at the bottom ─────────────────────────── */
+
+/* The avatar wrapper — ensure it's fully visible and not clipped */
+body .cephlon-rail .user-image-wrapper,
+body .desk-sidebar .user-image-wrapper,
+body [data-component="DeskSidebar"] .user-image-wrapper,
+body .cephlon-rail .avatar,
+body .desk-sidebar .avatar,
+body [data-component="DeskSidebar"] .avatar,
+body .cephlon-rail .gravatar,
+body .desk-sidebar .gravatar,
+body [data-component="DeskSidebar"] .gravatar,
+body .cephlon-rail [data-component="UserAvatar"],
+body .desk-sidebar [data-component="UserAvatar"],
+body [data-component="DeskSidebar"] [data-component="UserAvatar"],
+/* Frappe renders the user initial as a simple span/div with .avatar-small / .avatar-medium */
+body .cephlon-rail .avatar-small,
+body .desk-sidebar .avatar-small,
+body [data-component="DeskSidebar"] .avatar-small,
+body .cephlon-rail .avatar-medium,
+body .desk-sidebar .avatar-medium,
+body [data-component="DeskSidebar"] .avatar-medium {
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	width: 36px !important;
+	height: 36px !important;
+	min-width: 36px !important;
+	min-height: 36px !important;
+	border-radius: 50% !important;
+	background-color: #f79630 !important;
+	color: #0f1b2d !important;
+	font-size: 15px !important;
+	font-weight: 700 !important;
+	overflow: visible !important;
+	flex-shrink: 0 !important;
+}
+
+/* The bottom section that holds the avatar — no clipping */
+body .cephlon-rail > *:last-child,
+body .desk-sidebar > *:last-child,
+body [data-component="DeskSidebar"] > *:last-child {
+	overflow: visible !important;
+	padding-bottom: 8px !important;
+}
+
+/* Make sure the bottom user button is fully shown */
+body .cephlon-rail .user-image,
+body .desk-sidebar .user-image,
+body [data-component="DeskSidebar"] .user-image {
+	width: 36px !important;
+	height: 36px !important;
+	border-radius: 50% !important;
+	object-fit: cover !important;
+	display: block !important;
+	flex-shrink: 0 !important;
 }

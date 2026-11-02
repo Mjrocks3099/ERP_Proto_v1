@@ -78,6 +78,19 @@
 		});
 	};
 
+	const markCephlonRail = () => {
+		const rail = [...document.querySelectorAll("body *")]
+			.filter((element) => {
+				const rect = element.getBoundingClientRect();
+				return rect.left <= 2 && rect.width >= 50 && rect.width <= 90 &&
+					rect.height >= window.innerHeight * 0.7 &&
+					element.querySelectorAll("a, button, svg").length >= 5;
+			})
+			.sort((first, second) => first.getBoundingClientRect().width - second.getBoundingClientRect().width)[0];
+
+		if (rail) rail.classList.add("cephlon-rail");
+	};
+
 	const renderCephlonHome = () => {
 		if (!isDeskRoute()) return;
 
@@ -85,6 +98,7 @@
 		if (!main) return;
 
 		replaceFrappeBranding();
+		markCephlonRail();
 		replaceVisibleErpnextText(main);
 		hideErpnextTutorials(main);
 		if (!isBannerRoute()) {

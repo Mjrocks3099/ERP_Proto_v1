@@ -200,6 +200,9 @@ Still inside the container (replace `192.168.1.100` with your **server IP**):
 cd /workspace/bench
 
 bench new-site 192.168.1.100 \
+  --db-host mariadb \
+  --db-type mariadb \
+  --db-root-username root \
   --db-root-password 'YourStrongPassword123!' \
   --admin-password  'YourAdminPassword456!' \
   --mariadb-user-host-login-scope='%'

@@ -224,25 +224,18 @@ exit
 
 Frappe will compile bundles and link all static assets (including your Cephlon theme, logo, and styles).
 
-First, create the `common_site_config.json` file in sites (this prevents the Vite banking error):
+Run from the host server:
 
 ```bash
 docker compose exec --user frappe -T frappe bash -lc \
-  "echo '{\"webserver_port\": 8000}' > /workspace/bench/sites/common_site_config.json"
-```
-
-Then run the build (you can use `--skip-yarn` or standard build):
-
-```bash
-docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench build --app erpnext --skip-yarn"
+  "cd /workspace/bench && bench build --app erpnext"
 
 docker compose exec --user frappe -T frappe bash -lc \
   "cd /workspace/bench && bench --site 192.168.1.100 clear-cache"
 ```
 
-> **Note on `bench build` flags:**
-> Modern Bench uses `--skip-yarn` (not `--no-yarn`). If your bench version does not support `--skip-yarn`, creating `common_site_config.json` (as shown above) allows standard `bench build --app erpnext` to succeed without error.
+> **How the build works:**
+> All your custom Cephlon assets (`cephlon-dashboard-panel.css`, `cephlon-dashboard-home.css`, `cephlon-erp-login.css`, `cephlon-logo.png`, etc.) are linked into `sites/assets/erpnext/` and cached for production. The `package.json` has been updated so it no longer attempts to trigger an external Vite banking build.
 
 ---
 

@@ -1,0 +1,127 @@
+.cephlon-hide-tutorial,
+.cephlon-hide-tutorial-media {
+	display: none !important;
+}
+
+.cephlon-hide-erpnext-brand {
+	display: none !important;
+}
+
+.cephlon-home-banner {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 28px;
+	margin: 0 0 24px;
+	padding: 28px 32px;
+	border-radius: 14px;
+	background: linear-gradient(115deg, #18263e 0%, #0f1b2d 72%, #0b1424 100%);
+	box-shadow: 0 10px 28px rgba(15, 27, 45, 0.18);
+	color: #ffffff;
+	overflow: hidden;
+}
+
+.cephlon-home-banner::after {
+	position: absolute;
+	right: -70px;
+	bottom: -100px;
+	width: 250px;
+	height: 250px;
+	border: 34px solid rgba(247, 150, 48, 0.16);
+	border-radius: 50%;
+	content: "";
+}
+
+.cephlon-home-banner__content,
+.cephlon-home-banner__actions {
+	position: relative;
+	z-index: 1;
+}
+
+.cephlon-home-logo {
+	display: block;
+	width: 96px;
+	height: 64px;
+	margin: 0 0 16px;
+	object-fit: contain;
+	object-position: left top;
+}
+
+.cephlon-home-banner__content {
+	min-width: 0;
+}
+
+.cephlon-home-banner__eyebrow {
+	margin: 0 0 6px;
+	color: #f79630;
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.cephlon-home-banner h2 {
+	margin: 0 0 8px;
+	color: #ffffff;
+	font-size: 28px;
+	font-weight: 700;
+}
+
+.cephlon-home-banner p {
+	max-width: 560px;
+	margin: 0;
+	color: rgba(255, 255, 255, 0.78);
+	font-size: 15px;
+}
+
+.cephlon-home-banner__actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.cephlon-home-action {
+	display: inline-flex;
+	align-items: center;
+	min-height: 38px;
+	padding: 0 14px;
+	border: 1px solid rgba(255, 255, 255, 0.22);
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.08);
+	color: #ffffff !important;
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none !important;
+	transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.cephlon-home-action--primary {
+	border-color: #f79630;
+	background: #f79630;
+	color: #0f1b2d !important;
+}
+
+.cephlon-home-action:hover {
+	border-color: #ffad58;
+	background: rgba(247, 150, 48, 0.22);
+	color: #ffffff !important;
+	transform: translateY(-1px);
+}
+
+.cephlon-home-action--primary:hover {
+	background: #ffad58;
+	color: #0f1b2d !important;
+}
+
+@media (max-width: 900px) {
+	.cephlon-home-banner {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.cephlon-home-banner__actions {
+		justify-content: flex-start;
+	}
+}

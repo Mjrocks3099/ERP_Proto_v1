@@ -1,0 +1,67 @@
+#page-login {
+	--cephlon-orange: #f97316;
+	--cephlon-orange-light: #fb923c;
+	--cephlon-ink: #0b1117;
+	min-height: 100vh;
+	background: radial-gradient(circle at 50% 0%, rgba(249, 115, 22, 0.16), transparent 34rem), linear-gradient(145deg, #080d12 0%, #111a23 100%);
+}
+
+#page-login .page-content-wrapper,
+#page-login main.container {
+	background: transparent;
+}
+
+#page-login .login-content.page-card {
+	border: 1px solid rgba(249, 115, 22, 0.28);
+	border-radius: 18px;
+	background: rgba(15, 23, 32, 0.94);
+	box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+#page-login .app-logo {
+	max-height: 68px;
+	max-width: 230px;
+	object-fit: contain;
+}
+
+#page-login .page-card-subtitle {
+	display: none !important;
+}
+
+#page-login .page-card-head h4,
+#page-login .page-card-head-text,
+#page-login label,
+#page-login .page-card-subtitle,
+#page-login a {
+	color: #f8fafc;
+}
+
+#page-login .page-card-subtitle {
+	color: #cbd5e1;
+}
+
+#page-login .form-control {
+	border-color: rgba(148, 163, 184, 0.32);
+	background: rgba(15, 23, 32, 0.82);
+	color: #f8fafc;
+}
+
+#page-login .form-control:focus {
+	border-color: var(--cephlon-orange);
+	box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+}
+
+#page-login .es-button[data-variant="solid"] {
+	background: var(--cephlon-orange);
+	color: var(--cephlon-ink);
+	font-weight: 700;
+}
+
+#page-login .es-button[data-variant="solid"]:hover {
+	background: var(--cephlon-orange-light);
+}
+
+#page-login .btn-login-option {
+	border-color: rgba(249, 115, 22, 0.45);
+	color: var(--cephlon-orange-light);
+}

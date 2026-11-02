@@ -1,0 +1,132 @@
+/* Cephlon gradient for the narrow C-dot Desk navigation rail. */
+body .desk-sidebar,
+body [data-component="DeskSidebar"] {
+	position: relative;
+	min-height: 100vh;
+	background: linear-gradient(180deg, #18263e 0%, #0f1b2d 58%, #0b1424 100%) !important;
+	color: #ffffff !important;
+	border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Nested rail wrappers must stay transparent or they cover the gradient. */
+body .desk-sidebar *,
+body [data-component="DeskSidebar"] * {
+	background-color: transparent !important;
+	color: rgba(255, 255, 255, 0.78) !important;
+}
+
+body .desk-sidebar a,
+body .desk-sidebar button,
+body .desk-sidebar .icon,
+body .desk-sidebar svg,
+body [data-component="DeskSidebar"] a,
+body [data-component="DeskSidebar"] button,
+body [data-component="DeskSidebar"] .icon,
+body [data-component="DeskSidebar"] svg {
+	color: rgba(255, 255, 255, 0.78) !important;
+	fill: currentColor;
+	stroke: currentColor;
+}
+
+body .desk-sidebar a:hover,
+body .desk-sidebar button:hover,
+body .desk-sidebar .active,
+body .desk-sidebar .selected,
+body .desk-sidebar [aria-current="page"],
+body .desk-sidebar [data-active="true"],
+body .desk-sidebar .navbar-home:hover,
+body [data-component="DeskSidebar"] a:hover,
+body [data-component="DeskSidebar"] button:hover,
+body [data-component="DeskSidebar"] .active,
+body [data-component="DeskSidebar"] .selected,
+body [data-component="DeskSidebar"] [aria-current="page"],
+body [data-component="DeskSidebar"] [data-active="true"] {
+	position: relative;
+	border-color: #f79630 !important;
+	border-radius: 8px;
+	background: rgba(247, 150, 48, 0.16) !important;
+	box-shadow: 0 0 0 2px rgba(247, 150, 48, 0.16) !important;
+	color: #f79630 !important;
+}
+
+body .desk-sidebar .active::before,
+body .desk-sidebar .selected::before,
+body .desk-sidebar [aria-current="page"]::before,
+body .desk-sidebar [data-active="true"]::before,
+body [data-component="DeskSidebar"] .active::before,
+body [data-component="DeskSidebar"] .selected::before,
+body [data-component="DeskSidebar"] [aria-current="page"]::before,
+body [data-component="DeskSidebar"] [data-active="true"]::before {
+	position: absolute;
+	top: 7px;
+	bottom: 7px;
+	left: -1px;
+	width: 3px;
+	border-radius: 0 3px 3px 0;
+	background: #f79630 !important;
+	content: "";
+}
+
+body .desk-sidebar a:hover .icon,
+body .desk-sidebar button:hover .icon,
+body .desk-sidebar a:hover svg,
+body .desk-sidebar button:hover svg,
+body .desk-sidebar .active .icon,
+body .desk-sidebar .selected .icon,
+body .desk-sidebar [aria-current="page"] .icon,
+body [data-component="DeskSidebar"] a:hover .icon,
+body [data-component="DeskSidebar"] button:hover .icon,
+body [data-component="DeskSidebar"] a:hover svg,
+body [data-component="DeskSidebar"] button:hover svg,
+body [data-component="DeskSidebar"] .active .icon,
+body [data-component="DeskSidebar"] .selected .icon,
+body [data-component="DeskSidebar"] [aria-current="page"] .icon {
+	color: #f79630 !important;
+	fill: #f79630 !important;
+	stroke: #f79630 !important;
+}
+
+/* Orange hover accent for the remaining Desk dashboard controls. */
+.layout-main-section .widget:hover,
+.layout-main-section .number-widget-box:hover,
+.layout-main-section .shortcut-widget-box:hover,
+.layout-main-section .onboard-quick-list:hover,
+.layout-main-section .workspace-link:hover {
+	border-color: #f79630 !important;
+	box-shadow: 0 0 0 2px rgba(247, 150, 48, 0.16) !important;
+}
+
+.layout-main-section .form-control:hover,
+.layout-main-section .frappe-control .input-with-feedback:hover,
+.layout-main-section .awesomplete > input:hover {
+	border-color: #f79630 !important;
+}
+
+/* Frappe versions use several dashboard class names; keep the accent visible across them. */
+.widget:hover,
+.number-widget-box:hover,
+.shortcut-widget-box:hover,
+.onboard-quick-list:hover,
+.frappe-card:hover,
+.form-dashboard-section:hover,
+.workspace-link:hover,
+.standard-sidebar-item:hover,
+.sidebar-item:hover,
+.list-row:hover,
+.result-row:hover {
+	border-color: #f79630 !important;
+	background-image: linear-gradient(rgba(247, 150, 48, 0.08), rgba(247, 150, 48, 0.08));
+	box-shadow: 0 0 0 2px rgba(247, 150, 48, 0.16) !important;
+}
+
+body .form-control:hover,
+body .input-with-feedback:hover,
+body .awesomplete > input:hover,
+body .data-table input:hover,
+body .form-control:focus,
+body .input-with-feedback:focus,
+body .awesomplete > input:focus,
+body .data-table input:focus {
+	border-color: #f79630 !important;
+	box-shadow: 0 0 0 3px rgba(247, 150, 48, 0.16) !important;
+}

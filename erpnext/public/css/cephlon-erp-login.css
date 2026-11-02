@@ -1,0 +1,360 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@500;600;700&display=swap");
+
+#page-login,
+#page-login * {
+	box-sizing: border-box;
+}
+
+html:has(#page-login),
+body:has(#page-login) {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+
+#page-login {
+	width: 100%;
+	height: 100dvh;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: hidden;
+	background: #161616;
+	color: #ffffff;
+}
+
+#page-login .page-content-wrapper {
+	box-sizing: border-box;
+	display: flex;
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background: #161616;
+}
+
+#page-login .page-breadcrumbs,
+#page-login main > .page-header-wrapper {
+	display: none;
+}
+
+#page-login .cephlon-brand-panel {
+	position: relative;
+	display: flex;
+	width: 42%;
+	flex: 0 0 42%;
+	height: 100%;
+	min-height: 0;
+	flex-direction: column;
+	justify-content: space-between;
+	box-sizing: border-box;
+	padding: 58px 52px 48px;
+	background: #0f1b2d;
+	color: #ffffff;
+}
+
+#page-login .cephlon-brand-logo {
+	display: block;
+	width: auto;
+	max-width: min(260px, 80%);
+	height: auto;
+	max-height: 86px;
+	object-fit: contain;
+	object-position: left center;
+}
+
+#page-login .cephlon-brand-copy {
+	margin-top: auto;
+	margin-bottom: auto;
+}
+
+#page-login .cephlon-brand-copy h1 {
+	margin: 0 0 12px;
+	font-family: "Raleway", "Railway", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 36px;
+	font-weight: 700;
+	letter-spacing: -1.5px;
+	color: #ffffff;
+}
+
+#page-login .cephlon-brand-copy h1 span {
+	color: #f79630;
+}
+
+#page-login .cephlon-brand-copy p,
+#page-login .cephlon-brand-footer span {
+	margin: 0;
+	color: #b8c3d5;
+	font-family: "Raleway", "Railway", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 18px;
+	line-height: 1.45;
+}
+
+#page-login .cephlon-brand-footer {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	font-size: 16px;
+}
+
+#page-login .cephlon-brand-footer strong {
+	font-size: 16px;
+}
+
+#page-login main.container {
+	display: flex;
+	width: 58%;
+	flex: 0 0 58%;
+	max-width: none;
+	height: 100%;
+	min-height: 0;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	background: #161616;
+	overflow: hidden;
+}
+
+#page-login .page_content,
+#page-login .for-login {
+	box-sizing: border-box;
+	width: 100%;
+	min-width: 0;
+}
+
+#page-login .login-content.page-card {
+	box-sizing: border-box;
+	width: min(100%, 580px);
+	max-width: 580px;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+	padding: 24px;
+	overflow: hidden;
+}
+
+#page-login .form-login,
+#page-login .page-card-body,
+#page-login .page-card-actions {
+	width: 100%;
+	max-width: none;
+}
+
+#page-login .app-logo {
+	display: none;
+}
+
+#page-login .page-card-head h4,
+#page-login .page-card-subtitle,
+#page-login label,
+#page-login .form-control,
+#page-login a {
+	color: #f8fafc;
+}
+
+#page-login .page-card-subtitle {
+	color: rgba(255, 255, 255, 0.62);
+	font-size: 13.5px;
+	line-height: 24px;
+}
+
+#page-login .page-card-head h4 {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+#page-login .form-control {
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 12px;
+	background: #202020;
+	min-height: 46px;
+	padding: 0 12px;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 15px;
+}
+
+#page-login .form-group label {
+	color: rgba(255, 255, 255, 0.85);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 15.6px;
+}
+
+#page-login .form-login a[href="#forgot"] {
+	color: #f79630 !important;
+	font-size: 13px;
+}
+
+#page-login .form-control:focus {
+	border-color: rgba(255, 255, 255, 0.32);
+	box-shadow: 0 0 0 3px rgba(247, 150, 48, 0.18);
+}
+
+#page-login .es-button[data-variant="solid"] {
+	background: #f79630;
+	border-radius: 10px;
+	color: #0f1b2d;
+	font-weight: 700;
+	min-height: 46px;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 15px;
+}
+
+#page-login .es-button[data-variant="solid"]:hover {
+	background: #ffad58;
+}
+
+#page-login .btn-login-option {
+	width: 100%;
+	min-height: 46px;
+	border: 0 !important;
+	border-radius: 10px;
+	background: #f79630 !important;
+	color: #0f1b2d !important;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 46px;
+	text-align: center;
+	text-decoration: none;
+}
+
+#page-login .btn-login-option:hover {
+	background: #ffad58 !important;
+	color: #0f1b2d !important;
+}
+
+#page-login .cephlon-remember {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 4px;
+	color: #ffffff;
+	font-size: 14px;
+}
+
+#page-login .cephlon-remember input {
+	position: relative;
+	width: 20px;
+	height: 20px;
+	margin: 0;
+	appearance: none;
+	border: 0;
+	border-radius: 3px;
+	background: #202020;
+	cursor: pointer;
+}
+
+#page-login .cephlon-remember input:checked {
+	background: #f79630;
+}
+
+#page-login .cephlon-remember input:checked::after {
+	position: absolute;
+	top: 4px;
+	left: 5px;
+	width: 8px;
+	height: 5px;
+	border-bottom: 2px solid #ffffff;
+	border-left: 2px solid #ffffff;
+	content: "";
+	transform: rotate(-45deg);
+}
+
+#page-login .cephlon-login-footer {
+	margin-top: 24px;
+	color: rgba(255, 255, 255, 0.62);
+	font-size: 13px;
+	text-align: center;
+}
+
+@media (max-width: 768px) {
+	#page-login .page-content-wrapper {
+		overflow: visible;
+	}
+
+	#page-login .cephlon-brand-panel,
+	#page-login main.container {
+		width: 100%;
+		flex: 0 0 auto;
+		height: auto;
+		min-height: 0;
+	}
+
+	#page-login .page-content-wrapper {
+		flex-direction: column;
+	}
+
+	#page-login main.container {
+		height: 62%;
+		padding: 16px;
+	}
+
+	#page-login .cephlon-brand-panel {
+		height: 38%;
+		padding: 36px 28px;
+		justify-content: center;
+	}
+
+	#page-login .cephlon-brand-copy {
+		margin: 28px 0 0;
+	}
+
+	#page-login .cephlon-brand-footer {
+		display: none;
+	}
+
+	#page-login .login-content.page-card {
+		padding: 8px 0;
+	}
+
+	#page-login .form-login {
+		gap: 16px;
+	}
+
+	#page-login .page-card-body {
+		gap: 12px;
+	}
+}
+
+@media (max-height: 720px) and (min-width: 769px) {
+	#page-login .cephlon-brand-panel {
+		padding-top: 28px;
+		padding-bottom: 24px;
+	}
+
+	#page-login .cephlon-brand-copy h1 {
+		font-size: 30px;
+	}
+
+	#page-login .cephlon-brand-copy p,
+	#page-login .cephlon-brand-footer span {
+		font-size: 15px;
+	}
+
+	#page-login .login-content.page-card {
+		padding-top: 8px;
+		padding-bottom: 8px;
+	}
+
+	#page-login .form-login {
+		gap: 12px;
+	}
+
+	#page-login .page-card-body {
+		gap: 10px;
+	}
+
+	#page-login .form-control,
+	#page-login .es-button[data-variant="solid"],
+	#page-login .btn-login-option {
+		min-height: 40px;
+	}
+}

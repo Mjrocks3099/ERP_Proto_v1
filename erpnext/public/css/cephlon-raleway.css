@@ -1,0 +1,29 @@
+/* Shared Cephlon typography for the login page and ERPNext Desk. */
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap");
+
+body,
+body button,
+body input,
+body textarea,
+body select,
+body optgroup,
+body option,
+body .frappe-control,
+body .form-control,
+body .page-head,
+body .page-container,
+body .navbar,
+body .layout-side-section,
+body .layout-main-section {
+	font-family: "Raleway", "Railway", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+/* Keep icon glyphs and SVG rendering on their original font/stroke system. */
+body .icon,
+body .icon-md,
+body .icon-sm,
+body svg,
+body [class*="fa-"],
+body [class*="octicon"] {
+	font-family: inherit;
+}

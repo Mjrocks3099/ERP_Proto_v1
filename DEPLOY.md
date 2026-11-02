@@ -224,25 +224,25 @@ exit
 
 Frappe will compile bundles and link all static assets (including your Cephlon theme, logo, and styles).
 
-Run from the host server:
+First, create the `common_site_config.json` file in sites (this prevents the Vite banking error):
 
 ```bash
-# Recommended: Build assets skipping yarn sub-app (avoids banking/vite issues)
 docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench build --app erpnext --no-yarn"
+  "echo '{\"webserver_port\": 8000}' > /workspace/bench/sites/common_site_config.json"
+```
+
+Then run the build (you can use `--skip-yarn` or standard build):
+
+```bash
+docker compose exec --user frappe -T frappe bash -lc \
+  "cd /workspace/bench && bench build --app erpnext --skip-yarn"
 
 docker compose exec --user frappe -T frappe bash -lc \
   "cd /workspace/bench && bench --site 192.168.1.100 clear-cache"
 ```
 
-> **Note on `ERROR: yarn build failed for erpnext`:**
-> ERPNext includes an experimental `banking` React/Vite sub-app that tries to run `yarn build`. Your Cephlon custom navbar, dashboard banner, and login page do **not** use Vite; they are standard assets linked directly. Passing `--no-yarn` builds all your custom themes and assets immediately without needing Vite.
->
-> If you ever want to build the banking sub-app as well:
-> ```bash
-> docker compose exec --user frappe -T frappe bash -lc \
->   "cd /workspace/erpnext-source/banking && yarn install && yarn build"
-> ```
+> **Note on `bench build` flags:**
+> Modern Bench uses `--skip-yarn` (not `--no-yarn`). If your bench version does not support `--skip-yarn`, creating `common_site_config.json` (as shown above) allows standard `bench build --app erpnext` to succeed without error.
 
 ---
 
@@ -301,11 +301,11 @@ docker compose exec --user root frappe bash -c "chown -R frappe:frappe /workspac
 ```
 
 ### 4. `ERROR: yarn build failed for erpnext` / `ENOENT: no such file or directory open '/sites/common_site_config.json'`
-**Cause:** ERPNext's `banking` subfolder runs Vite and tries to read `/sites/common_site_config.json` before it exists. Your Cephlon customizations (navbar, colors, banners, logo) do not require Vite at all.  
-**Fix:** Run with the `--no-yarn` flag:
+**Cause:** ERPNext's `banking` subfolder runs Vite and looks for `/workspace/bench/sites/common_site_config.json`.  
+**Fix:** Create the missing file and build with `--skip-yarn`:
 ```bash
 docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench build --app erpnext --no-yarn"
+  "echo '{\"webserver_port\": 8000}' > /workspace/bench/sites/common_site_config.json && cd /workspace/bench && bench build --app erpnext --skip-yarn"
 ```
 
 ---

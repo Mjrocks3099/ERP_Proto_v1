@@ -4,9 +4,9 @@ body [data-component="DeskSidebar"],
 body .cephlon-rail {
 	position: relative;
 	min-height: 100vh;
-	width: 64px !important;
-	min-width: 64px !important;
-	max-width: 64px !important;
+	width: 80px !important;
+	min-width: 80px !important;
+	max-width: 80px !important;
 	background: linear-gradient(180deg, #18263e 0%, #0f1b2d 58%, #0b1424 100%) !important;
 	color: #ffffff !important;
 	border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -38,8 +38,64 @@ body .cephlon-rail button,
 body .cephlon-rail .icon,
 body .cephlon-rail svg {
 	color: rgba(255, 255, 255, 0.78) !important;
+	opacity: 1 !important;
 	fill: currentColor;
 	stroke: currentColor;
+}
+
+/* Larger, high-contrast controls keep Search, Notifications, Tasks, and apps visible. */
+body .cephlon-rail a,
+body .cephlon-rail button {
+	display: flex !important;
+	width: 58px !important;
+	height: 50px !important;
+	min-width: 58px !important;
+	min-height: 50px !important;
+	margin: 3px auto !important;
+	align-items: center !important;
+	justify-content: center !important;
+	padding: 0 !important;
+	text-align: center !important;
+}
+
+body .cephlon-rail svg,
+body .cephlon-rail .icon {
+	display: block !important;
+	width: 24px !important;
+	height: 24px !important;
+	min-width: 24px !important;
+	min-height: 24px !important;
+	color: rgba(255, 255, 255, 0.94) !important;
+	fill: none !important;
+	stroke: currentColor !important;
+	stroke-width: 1.8 !important;
+	margin: auto !important;
+}
+
+body .cephlon-rail .navbar-home img,
+body .cephlon-rail img.app-logo,
+body .cephlon-rail .app-logo {
+	width: 36px !important;
+	height: 36px !important;
+	max-width: 36px !important;
+	max-height: 36px !important;
+	object-fit: contain !important;
+}
+
+/* Keep the Administrator avatar visible at the bottom of the rail. */
+body .cephlon-rail .avatar,
+body .cephlon-rail .user-avatar,
+body .cephlon-rail [class*="user-avatar"] {
+	width: 44px !important;
+	height: 44px !important;
+	min-width: 44px !important;
+	min-height: 44px !important;
+	margin: 8px auto !important;
+	border: 2px solid #f79630 !important;
+	border-radius: 50% !important;
+	background: #f79630 !important;
+	color: #0f1b2d !important;
+	opacity: 1 !important;
 }
 
 body .desk-sidebar a:hover,
@@ -183,6 +239,93 @@ body .awesomplete > input:focus,
 body .data-table input:focus {
 	border-color: #f79630 !important;
 	box-shadow: 0 0 0 3px rgba(247, 150, 48, 0.16) !important;
+}
+
+/* Utility controls stay clean: no orange hover box around C-dot, Search,
+   Notifications, Flow/Help, or Background Tasks. */
+body .cephlon-rail .navbar-home,
+body .cephlon-rail [aria-label*="Search"],
+body .cephlon-rail [title*="Search"],
+body .cephlon-rail [aria-label*="Notification"],
+body .cephlon-rail [title*="Notification"],
+body .cephlon-rail [aria-label*="Flow"],
+body .cephlon-rail [title*="Flow"],
+body .cephlon-rail [aria-label*="Task"],
+body .cephlon-rail [title*="Task"],
+body .cephlon-rail [aria-label*="Help"],
+body .cephlon-rail [title*="Help"] {
+	border-color: transparent !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: rgba(255, 255, 255, 0.94) !important;
+}
+
+body .cephlon-rail [aria-label*="All app"],
+body .cephlon-rail [title*="All app"],
+body .cephlon-rail [data-label*="All app"] {
+	border-color: transparent !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: rgba(255, 255, 255, 0.94) !important;
+}
+
+body .cephlon-rail .navbar-home:hover,
+body .cephlon-rail [aria-label*="Search"]:hover,
+body .cephlon-rail [title*="Search"]:hover,
+body .cephlon-rail [aria-label*="Notification"]:hover,
+body .cephlon-rail [title*="Notification"]:hover,
+body .cephlon-rail [aria-label*="Flow"]:hover,
+body .cephlon-rail [title*="Flow"]:hover,
+body .cephlon-rail [aria-label*="Task"]:hover,
+body .cephlon-rail [title*="Task"]:hover,
+body .cephlon-rail [aria-label*="Help"]:hover,
+body .cephlon-rail [title*="Help"]:hover {
+	border-color: transparent !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+body .cephlon-rail [aria-label*="All app"]:hover,
+body .cephlon-rail [title*="All app"]:hover,
+body .cephlon-rail [data-label*="All app"]:hover {
+	border-color: transparent !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+body .cephlon-rail .navbar-home::before,
+body .cephlon-rail [aria-label*="Search"]::before,
+body .cephlon-rail [title*="Search"]::before,
+body .cephlon-rail [aria-label*="Notification"]::before,
+body .cephlon-rail [title*="Notification"]::before,
+body .cephlon-rail [aria-label*="Flow"]::before,
+body .cephlon-rail [title*="Flow"]::before,
+body .cephlon-rail [aria-label*="Task"]::before,
+body .cephlon-rail [title*="Task"]::before,
+body .cephlon-rail [aria-label*="Help"]::before,
+body .cephlon-rail [title*="Help"]::before {
+	display: none !important;
+}
+
+body .cephlon-rail [aria-label*="All app"]::before,
+body .cephlon-rail [title*="All app"]::before,
+body .cephlon-rail [data-label*="All app"]::before {
+	display: none !important;
+}
+
+/* Frappe places these four utility buttons in a wider internal wrapper.
+   Offset only those wrappers so their SVGs align with the module icons. */
+body .cephlon-rail [aria-label*="Search"],
+body .cephlon-rail [title*="Search"],
+body .cephlon-rail [aria-label*="Notification"],
+body .cephlon-rail [title*="Notification"],
+body .cephlon-rail [aria-label*="Flow"],
+body .cephlon-rail [title*="Flow"],
+body .cephlon-rail [aria-label*="Task"],
+body .cephlon-rail [title*="Task"],
+body .cephlon-rail [aria-label*="Help"],
+body .cephlon-rail [title*="Help"] {
+	transform: translateX(-10px) !important;
 }
 
 /* ─── Navbar / Rail size & icon improvements ────────────────────────────── */

@@ -98,7 +98,9 @@ cd /opt/cephlon/erpnext
 
 ---
 
-## Step 3 — Set Database Password
+## Step 3 — Configure `.env` File
+
+For complete details on all `.env` options, see [`instruction.md`](./instruction.md).
 
 ```bash
 cd /opt/cephlon/erpnext
@@ -106,9 +108,12 @@ cp .env.example .env
 nano .env
 ```
 
-Set:
+Set your database password and server IP:
 ```env
 MARIADB_ROOT_PASSWORD=YourStrongPassword123!
+FRAPPE_SITE=YOUR_SERVER_IP
+FRAPPE_HOST=YOUR_SERVER_IP
+HTTP_PORT=3011
 ```
 
 ---

@@ -75,6 +75,30 @@ test -f "$asset_link/js/cephlon-dashboard-home.js"'
 
 The command should print /workspace/erpnext-source/erpnext/public and exit successfully. If it says the path exists as a real directory, do not delete it blindly. Inspect its contents and permissions first.
 
+If the guard reports that /workspace/bench/sites/assets/erpnext is a real directory, keep that directory. It may contain generated ERPNext bundles. Link only the Cephlon files into it so the existing bundle files remain in place:
+
+~~~bash
+sudo docker compose exec -u root -T frappe bash -lc '
+source_dir=/workspace/erpnext-source/erpnext/public
+asset_dir=/workspace/bench/sites/assets/erpnext
+for file in \
+  css/cephlon-raleway.css \
+  css/cephlon-erp-login.css \
+  css/cephlon-dashboard-panel.css \
+  css/cephlon-dashboard-home.css \
+  js/cephlon-erp-login.js \
+  js/cephlon-login.js \
+  js/cephlon-dashboard-home.js \
+  images/cephlon-logo.png
+do
+  mkdir -p "$asset_dir/$(dirname "$file")"
+  ln -sfn "$source_dir/$file" "$asset_dir/$file"
+done
+ls -l "$asset_dir/css/cephlon-raleway.css" "$asset_dir/js/cephlon-dashboard-home.js" "$asset_dir/images/cephlon-logo.png"'
+~~~
+
+This preserves other files in the real asset directory and makes the Cephlon files follow the checked-out source. Verify the paths, then continue with Step 3.
+
 ## 3. Clear cache and restart the web services
 
 After the link and files are verified:

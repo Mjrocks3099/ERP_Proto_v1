@@ -165,7 +165,7 @@ Before testing URLs, check the generated public-assets link. Frappe serves files
 sudo docker compose exec -T frappe readlink -f /workspace/bench/sites/assets/erpnext
 ~~~
 
-Expected target: /workspace/erpnext-source/erpnext/public. A 404 for every custom asset usually means this link is missing or points to the wrong directory, even when the source files exist.
+Expected target: /workspace/erpnext-source/erpnext/public. The URL path is /assets/erpnext/..., spelled assets. /assests/... is misspelled and will always return 404. A 404 for every correctly spelled custom asset usually means this link is missing or points to the wrong directory, even when source files exist.
 
 If the link is missing or is a symlink to the wrong target, recreate it as the frappe user:
 
@@ -175,7 +175,19 @@ sudo docker compose exec -T -w /workspace/bench frappe bench --site development.
 sudo docker compose restart frappe nginx
 ~~~
 
-Run from the server host. Every command should return HTTP 200:
+First test one correctly spelled URL. It should return HTTP 200:
+
+~~~bash
+curl -sS -o /dev/null -w 'HTTP %{http_code}\n' "http://127.0.0.1:3011/assets/erpnext/css/cephlon-raleway.css?v=2"
+sudo docker compose exec -T frappe ls -l /workspace/bench/sites/assets/erpnext/css/cephlon-raleway.css
+sudo docker compose exec -T frappe ls -l /workspace/erpnext-source/erpnext/public/css/cephlon-raleway.css
+~~~
+
+If the source file exists but its sites/assets path does not, repair the link above. If the source file is missing too, the server checkout is not the expected Git revision.
+
+The curl checks do not use or change your browser session. A 404 response by itself does not log the browser out. If the Frappe service was restarted during recovery, sign in again after it is healthy.
+
+Then run the full asset check from the server host. Each correctly spelled URL should return HTTP 200:
 
 ~~~bash
 for path in \
@@ -241,7 +253,7 @@ Use the Step 4 ownership command, then retry bench setup requirements.
 
 ### Assets return 404
 
-A 404 means Frappe cannot find the requested path under sites/assets. Check that /workspace/bench/sites/assets/erpnext resolves to /workspace/erpnext-source/erpnext/public, that the named file exists under erpnext/public, and that hooks.py uses the same filename. If the source file exists but the assets link is missing, use the repair command in Step 7, then clear cache and restart.
+A 404 at /assests/... is a URL spelling error; use /assets/... . For a correctly spelled URL, check the site assets link and compare the requested file under sites/assets with its source under /workspace/erpnext-source/erpnext/public. If the source exists but the sites/assets path does not, use the repair command in Step 7. The curl check does not change browser cookies. A Frappe restart may require signing in again after the service becomes healthy.
 
 ### Nginx is unreachable from outside
 

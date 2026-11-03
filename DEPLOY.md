@@ -131,6 +131,12 @@ fi
 git config --global --add safe.directory /workspace/erpnext-source'
 ~~~
 
+The ERPNext checkout is bind-mounted into the container. On Linux, the frappe user must be able to write the JavaScript dependency folders before requirements are installed. Create and assign those folders once:
+
+~~~bash
+sudo docker compose exec -u root -T frappe bash -lc 'mkdir -p /workspace/erpnext-source/node_modules /workspace/erpnext-source/banking/node_modules && chown -R frappe:frappe /workspace/erpnext-source/node_modules /workspace/erpnext-source/banking/node_modules'
+~~~
+
 Install Python and JavaScript requirements and prepare app assets. This may use substantial CPU, memory, disk, and network bandwidth:
 
 ~~~bash
@@ -308,6 +314,21 @@ sudo docker compose logs --tail=150 frappe
 ~~~
 
 If the site is not initialized, complete sections 5 and 6, then restart Frappe. Ensure MariaDB is healthy before running new-site.
+
+### Startup command reports bash: lc: No such file or directory
+
+The server may have an older or malformed Compose command. Pull the revision containing the direct Bash script command, then validate and recreate the service:
+
+~~~bash
+git pull
+sudo docker compose config
+sudo docker compose up -d --build --force-recreate frappe
+sudo docker compose logs --tail=50 frappe
+~~~
+
+Confirm the checked-out file exists with test -f frappe-start.sh. Docker Compose config should show the Frappe command as two arguments: bash and /workspace/erpnext-source/frappe-start.sh.
+
+If the container instead reports Procfile not found, the script is running correctly but the Bench is not initialized yet; complete sections 5 and 6 before restarting Frappe.
 
 ### Permission denied under /workspace/bench
 

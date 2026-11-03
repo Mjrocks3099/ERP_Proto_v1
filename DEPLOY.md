@@ -54,7 +54,7 @@ This usually means the deployed checkout is old, the Bench app symlink points to
 git pull
 sudo docker compose exec -T frappe readlink -f /workspace/bench/apps/erpnext
 sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost list-apps
-sudo docker compose exec -T frappe grep -n cephlon-dashboard-home.js /workspace/bench/apps/erpnext/hooks.py
+sudo docker compose exec -T frappe grep -n cephlon-dashboard-home.js /workspace/bench/apps/erpnext/erpnext/hooks.py
 sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost clear-cache
 sudo docker compose restart frappe nginx
 ~~~
@@ -411,7 +411,7 @@ An old Frappe or ERPNext screen usually means the server has an older Git revisi
 git pull
 sudo docker compose exec -T frappe readlink -f /workspace/bench/apps/erpnext
 sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost list-apps
-sudo docker compose exec -T frappe grep -n cephlon-dashboard-home.js /workspace/bench/apps/erpnext/hooks.py
+sudo docker compose exec -T frappe grep -n cephlon-dashboard-home.js /workspace/bench/apps/erpnext/erpnext/hooks.py
 ~~~
 
 The symlink should resolve to /workspace/erpnext-source, and list-apps should include erpnext. The current hooks.py should reference the Cephlon login and Desk assets with their version query strings. If the link points somewhere else and apps/erpnext is already a symlink, update it:

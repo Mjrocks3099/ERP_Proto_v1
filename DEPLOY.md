@@ -1,332 +1,358 @@
-# Cephlon ERP — Server Deployment Guide (IP + Port)
+# ERP_Proto_v1 Docker Server Deployment
 
-Access the app at:  **`http://YOUR_SERVER_IP:3011`**
+This guide deploys the repository on Ubuntu and exposes ERPNext on the server public IP at TCP port 3011.
 
-No domain name or HTTPS needed.
+Example: http://203.0.113.10:3011
 
----
+The Compose stack builds Frappe from Dockerfile.cephlon, runs MariaDB and Redis privately, and publishes Nginx. Nginx routes public-IP requests to the site named development.localhost. Opening the root redirects to /login.
 
-## How the Startup Works
+> This is a development-oriented stack. It uses the Frappe develop branch, the mutable frappe/bench:latest image, editable source mounts, and plain HTTP. Restrict access with a firewall. Before sensitive production use, add TLS, pin versions, use a production process manager, and establish tested off-server backups.
 
-```
-First run (bench not initialized):
-  frappe-start.sh → Procfile NOT found → sleep infinity (container stays alive)
-  → You fix permissions (chown to frappe:frappe)
-  → You run bench init steps
-  → docker compose restart frappe
-  → frappe-start.sh → binds 0.0.0.0 → bench start ✅
+## 1. Server requirements
 
-Every restart after that:
-  frappe-start.sh → Procfile FOUND → bench start ✅ (fully automatic)
-```
+Use Ubuntu 22.04 or 24.04 with:
 
----
+- Public IPv4, or private IP reachable over VPN.
+- Suggested minimum: 4 CPU cores, 8 GB RAM, 50 GB free disk. The first build and app install take time and resources.
+- SSH and sudo access.
+- Outbound internet to download Docker images and Frappe dependencies.
+- Inbound TCP 3011 allowed by both host and cloud provider firewalls.
 
-## Architecture
+Install Docker Engine and Compose using Docker's current instructions:
 
-```
-Browser
-   │
-   ▼
-http://YOUR_SERVER_IP:3011
-   │
-Nginx (port 3011 → internal 80)
-   │
-   ├──▶ Frappe web process :8000  ◀──▶  MariaDB :3306
-   │              │
-   │              ├──▶ Redis cache  :6379
-   │              └──▶ Redis queue  :6379
-   └──▶ Frappe socketio :9000
-```
+- https://docs.docker.com/engine/install/ubuntu/
+- https://docs.docker.com/compose/install/linux/
+- https://docs.docker.com/engine/install/linux-postinstall/
 
----
+Verify:
 
-## Key Files Reference
-
-| File | Purpose |
-|---|---|
-| [`docker-compose.yml`](./docker-compose.yml) | All services — Nginx exposes port `3011`, Frappe runs with `user: frappe` |
-| [`frappe-start.sh`](./frappe-start.sh) | Smart startup — binds `0.0.0.0:8000` and auto-starts bench |
-| [`nginx/default.conf`](./nginx/default.conf) | Reverse proxy — `server_name _` accepts any IP |
-| [`.env.example`](./.env.example) | Copy to `.env` and set DB password and HTTP_PORT |
-| [`erpnext/hooks.py`](./erpnext/hooks.py) | App config, CSS/JS version cache busting |
-| [`erpnext/public/css/cephlon-dashboard-panel.css`](./erpnext/public/css/cephlon-dashboard-panel.css) | Navbar/sidebar dark theme |
-| [`erpnext/public/js/cephlon-dashboard-home.js`](./erpnext/public/js/cephlon-dashboard-home.js) | Branding JS |
-
----
-
-## Step 1 — Server Requirements
-
-| Resource | Minimum |
-|---|---|
-| OS | Ubuntu 22.04 LTS / 24.04 LTS |
-| CPU | 2 cores |
-| RAM | 4 GB |
-| Disk | 40 GB |
-| Network | Server with reachable IP |
-
-### Install Docker & Git
-
-```bash
-sudo apt-get update && sudo apt-get upgrade -y
-sudo apt-get install -y ca-certificates curl gnupg lsb-release git
-
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-  https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-
+~~~bash
+sudo docker version
+sudo docker compose version
 sudo systemctl enable --now docker
-sudo usermod -aG docker "$USER" && newgrp docker
-```
+~~~
 
----
+The docker group grants root-level privileges. This guide uses sudo for Docker commands.
 
-## Step 2 — Copy Code to Server
+## 2. Clone the complete Git repository
 
-```bash
+A server clone only contains committed and pushed files. Ensure the revision being deployed contains the deployment files and customizations in section 10.
+
+Replace the example URL with your actual Git URL:
+
+~~~bash
 sudo mkdir -p /opt/cephlon
-sudo chown -R "$USER":"$USER" /opt/cephlon
-git clone https://github.com/YOUR_ORG/YOUR_REPO.git /opt/cephlon/erpnext
-cd /opt/cephlon/erpnext
-```
+sudo chown "$USER":"$USER" /opt/cephlon
+git clone YOUR_GIT_REPOSITORY_URL /opt/cephlon/ERP_Proto_v1
+cd /opt/cephlon/ERP_Proto_v1
+~~~
 
----
+Configure Git authentication first if the repository is private. Do not put a personal access token in the repository URL or this guide.
 
-## Step 3 — Configure `.env` File
+Confirm the required files exist:
 
-For complete details on all `.env` options, see [`instruction.md`](./instruction.md).
+~~~bash
+test -f docker-compose.yml
+test -f Dockerfile.cephlon
+test -f frappe-start.sh
+test -f nginx/default.conf
+~~~
 
-```bash
-cd /opt/cephlon/erpnext
-cp .env.example .env
+## 3. Configure secrets and port
+
+Create a server-only .env in the repository root. Compose reads MARIADB_ROOT_PASSWORD and HTTP_PORT. Never commit .env.
+
+~~~bash
+openssl rand -hex 32
 nano .env
-```
+~~~
 
-Set your database password and server IP:
-```env
-MARIADB_ROOT_PASSWORD=YourStrongPassword123!
-FRAPPE_SITE=YOUR_SERVER_IP
-FRAPPE_HOST=YOUR_SERVER_IP
+Paste the generated value:
+
+~~~dotenv
+MARIADB_ROOT_PASSWORD=PASTE_LONG_RANDOM_VALUE_HERE
 HTTP_PORT=3011
-```
+~~~
 
----
+Save and restrict permissions:
 
-## Step 4 — Open Port 3011 in Firewall
+~~~bash
+chmod 600 .env
+~~~
 
-```bash
+Keep the database password available for section 6. Choose a separate strong ERPNext Administrator password and store both in a password manager.
+
+3011 is the default public port. For a different port, change HTTP_PORT, allow it through both firewalls, and use it in the browser URL. Nginx listens on port 80 inside the container.
+
+## 4. Build and start Docker
+
+From the repository directory:
+
+~~~bash
+sudo docker compose config
+sudo docker compose up -d --build
+sudo docker compose ps
+~~~
+
+The first build pulls frappe/bench and may take several minutes. Expected services: mariadb, redis-cache, redis-queue, frappe, nginx.
+
+Data is stored in named Docker volumes. On a fresh install, make the bench volume writable by the frappe container user:
+
+~~~bash
+sudo docker compose exec -u root frappe chown -R frappe:frappe /workspace/bench
+~~~
+
+Wait until MariaDB is healthy with docker compose ps. Frappe may be running but idle until Bench is initialized; frappe-start.sh waits for the Bench Procfile.
+
+## 5. Initialize Bench and link this ERPNext source
+
+Run these from the repository root. They execute inside the Frappe container as frappe.
+
+Initialize Bench and download Frappe develop:
+
+~~~bash
+sudo docker compose exec -T frappe bash -lc '
+if [ ! -f /workspace/bench/apps/frappe/pyproject.toml ]; then
+  bench init --ignore-exist --skip-redis-config-generation --frappe-branch develop /workspace/bench
+fi'
+~~~
+
+Link the app source from this repository and register it in apps.txt:
+
+~~~bash
+sudo docker compose exec -T frappe bash -lc '
+if [ ! -e /workspace/bench/apps/erpnext ]; then
+  ln -s /workspace/erpnext-source /workspace/bench/apps/erpnext
+fi
+if ! grep -qxF erpnext /workspace/bench/sites/apps.txt 2>/dev/null; then
+  printf "\n" >> /workspace/bench/sites/apps.txt
+  echo erpnext >> /workspace/bench/sites/apps.txt
+fi
+git config --global --add safe.directory /workspace/erpnext-source'
+~~~
+
+Install Python and JavaScript requirements and prepare app assets. This may use substantial CPU, memory, disk, and network bandwidth:
+
+~~~bash
+sudo docker compose exec -T -w /workspace/bench frappe bench setup requirements
+~~~
+
+Configure the database and Redis service names:
+
+~~~bash
+sudo docker compose exec -T -w /workspace/bench frappe bench set-config -g db_host mariadb
+sudo docker compose exec -T -w /workspace/bench frappe bench set-config -g redis_cache redis://redis-cache:6379
+sudo docker compose exec -T -w /workspace/bench frappe bench set-config -g redis_queue redis://redis-queue:6379
+sudo docker compose exec -T -w /workspace/bench frappe bench set-config -g redis_socketio redis://redis-queue:6379
+~~~
+
+## 6. Create the site and install ERPNext
+
+The site hostname is development.localhost because nginx/default.conf forwards public-IP requests to that host internally. Keep this site name unless you also update Nginx and intentionally migrate the site.
+
+Load the database password from .env and enter a separate Administrator password:
+
+~~~bash
+set -a
+. ./.env
+set +a
+read -rsp "Choose ERPNext Administrator password: " ERP_ADMIN_PASSWORD
+printf "\n"
+~~~
+
+Create the site. Docker Compose passes the secrets to this one-time command; they are not written into the image:
+
+~~~bash
+sudo docker compose exec -T \
+  -e MARIADB_ROOT_PASSWORD="$MARIADB_ROOT_PASSWORD" \
+  -e ERP_ADMIN_PASSWORD="$ERP_ADMIN_PASSWORD" \
+  frappe bash -lc '
+cd /workspace/bench
+if [ ! -d sites/development.localhost ]; then
+  bench new-site \
+    --db-root-password "$MARIADB_ROOT_PASSWORD" \
+    --admin-password "$ERP_ADMIN_PASSWORD" \
+    --mariadb-user-host-login-scope=% \
+    development.localhost
+fi'
+~~~
+
+Install ERPNext, disable developer mode for server access, and clear the site cache:
+
+~~~bash
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost set-config developer_mode 0
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost install-app erpnext
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost clear-cache
+~~~
+
+If install-app reports ERPNext is already installed, skip that command.
+
+## 7. Start and access the site
+
+Restart Frappe after creating the site and Procfile:
+
+~~~bash
+sudo docker compose restart frappe
+sudo docker compose ps
+sudo docker compose logs --tail=100 frappe
+~~~
+
+When services are healthy, open:
+
+~~~text
+http://YOUR_SERVER_PUBLIC_IP:3011
+~~~
+
+The root redirects to:
+
+~~~text
+http://YOUR_SERVER_PUBLIC_IP:3011/login
+~~~
+
+Sign in as Administrator using the password entered in section 6.
+
+Compose publishes only Nginx. MariaDB, Redis, Frappe web, and Socket.IO remain on private Docker networks.
+
+## 8. Allow the public port
+
+Allow SSH before enabling UFW. Replace 3011 if HTTP_PORT was changed:
+
+~~~bash
 sudo ufw allow OpenSSH
 sudo ufw allow 3011/tcp
 sudo ufw enable
 sudo ufw status
-```
+~~~
 
----
+Also allow inbound TCP 3011 in the cloud provider firewall/security group. If behind a router, forward the port to this server.
 
-## Step 5 — Make Script Executable & Start Containers
+Test from another machine:
 
-```bash
-cd /opt/cephlon/erpnext
-chmod +x frappe-start.sh
+~~~bash
+curl -I http://YOUR_SERVER_PUBLIC_IP:3011/login
+~~~
 
-docker compose up -d
-docker compose ps
-```
+Expected result: HTTP 200. The root URL may return a redirect to /login.
 
----
+## 9. Routine operations and backups
 
-## Step 6 — Fix Permissions (CRITICAL STEP)
+Run from the repository directory:
 
-> [!IMPORTANT]
-> The container runs as user `frappe` (UID 1000). Both `/workspace/bench` and `/workspace/erpnext-source` **must** be owned by `frappe` so yarn/pip can create folders like `node_modules` without `EACCES: permission denied` errors.
+~~~bash
+sudo docker compose ps
+sudo docker compose logs -f frappe
+sudo docker compose logs -f nginx
+sudo docker compose restart frappe nginx
+sudo docker compose stop
+sudo docker compose start
+~~~
 
-Run this command from the host server:
+stop keeps data. Do not run docker compose down -v unless you intentionally want to delete the database and bench volumes.
 
-```bash
-docker compose exec --user root frappe bash -c \
-  "chown -R frappe:frappe /workspace/bench /workspace/erpnext-source"
-```
+Check installed apps:
 
-*(Optional alternative directly on host: `sudo chown -R 1000:1000 /opt/cephlon/erpnext`)*
+~~~bash
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost list-apps
+~~~
 
----
+Create a database and files backup:
 
-## Step 7 — Initialize Bench (first time only)
+~~~bash
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost backup --with-files
+~~~
 
-Now enter the container as the **`frappe`** user:
+Bench stores backups under the site's private/backups directory in the persistent bench volume. Copy backups off the server and test restores. Back up both MariaDB and bench volumes before upgrades.
 
-```bash
-docker compose exec --user frappe frappe bash
-```
+For a reviewed source update, back up first, then:
 
-Run these commands inside the container:
+~~~bash
+git pull
+sudo docker compose up -d --build
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost migrate
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost clear-cache
+sudo docker compose restart frappe nginx
+~~~
 
-```bash
-# 1. Initialize bench if not already done
-if [ ! -f /workspace/bench/apps/frappe/pyproject.toml ]; then
-  bench init --ignore-exist --skip-redis-config-generation \
-    --frappe-branch develop /workspace/bench
-fi
+Cephlon CSS and JavaScript are included directly by hooks.py. After editing one, increment its query-string version in hooks.py, clear the site cache, and restart Frappe. A full bench build is generally unnecessary for these direct files. Rebuild and inspect output when changing bundled assets or app dependencies.
 
-# 2. Link Cephlon ERPNext source
-if [ ! -e /workspace/bench/apps/erpnext ]; then
-  ln -s /workspace/erpnext-source /workspace/bench/apps/erpnext
-fi
-grep -qxF erpnext /workspace/bench/sites/apps.txt 2>/dev/null \
-  || echo erpnext >> /workspace/bench/sites/apps.txt
+## 10. Deployment and customization file map
 
-# 3. Safe git directory
-git config --global --add safe.directory /workspace/erpnext-source
+These files define the current deployment and Cephlon UI behavior:
 
-# 4. Install Python and Node dependencies
-cd /workspace/bench
-bench setup requirements
+| File | Purpose |
+|---|---|
+| Dockerfile.cephlon | Builds Frappe from docker.io/frappe/bench:latest. Required by Compose. |
+| docker-compose.yml | MariaDB, Redis, Frappe, Nginx, persistent volumes, private networks, health checks, and public HTTP_PORT mapping. |
+| .env | Server-only MARIADB_ROOT_PASSWORD and HTTP_PORT. Never commit it. |
+| frappe-start.sh | Starts bench start once Procfile exists and binds web to the container network. Keep Unix LF line endings. |
+| nginx/default.conf | Routes IP requests to development.localhost, proxies Socket.IO, provides a health response, and redirects / to /login. |
+| docker-setup.ps1 | Windows first-time helper. This guide uses equivalent Linux commands on Ubuntu. |
+| erpnext/hooks.py | Registers custom login and Desk assets. Query versions invalidate browser caches after asset edits. |
+| erpnext/public/css/cephlon-erp-login.css | Login layout, dark theme, branding panel, and responsive styles. |
+| erpnext/public/css/cephlon-dashboard-panel.css | Cephlon Desk sidebar and panel appearance. |
+| erpnext/public/css/cephlon-dashboard-home.css | Home banner and initial UI visibility styles. |
+| erpnext/public/css/cephlon-raleway.css | Shared Cephlon typography. |
+| erpnext/public/js/cephlon-erp-login.js | Creates the login branding panel and labels. |
+| erpnext/public/js/cephlon-login.js | Additional login-page behavior. |
+| erpnext/public/js/cephlon-dashboard-home.js | Home banner, Cephlon text, sidebar branding, and route-render handling. |
+| erpnext/public/images/cephlon-logo.png | Logo used by login and Desk customizations. |
+| DEPLOY.md | This server guide and file map. |
 
-# 5. Point bench to Docker service hostnames
-bench set-config -g db_host mariadb
-bench set-config -g redis_cache    redis://redis-cache:6379
-bench set-config -g redis_queue    redis://redis-queue:6379
-bench set-config -g redis_socketio redis://redis-queue:6379
+## 11. Troubleshooting
 
-# 6. Bind web server to 0.0.0.0 so Nginx can reach it
-sed -i 's/bench serve  *--port 8000/bench serve --host 0.0.0.0 --port 8000/' /workspace/bench/Procfile
-```
+### 502 Bad Gateway
 
----
+~~~bash
+sudo docker compose ps
+sudo docker compose logs --tail=150 frappe
+~~~
 
-## Step 8 — Create the Site
+If the site is not initialized, complete sections 5 and 6, then restart Frappe. Ensure MariaDB is healthy before running new-site.
 
-Still inside the container (replace `192.168.1.100` with your **server IP**):
+### Permission denied under /workspace/bench
 
-```bash
-cd /workspace/bench
+Repair ownership and retry the failed Bench command:
 
-bench new-site 192.168.1.100 \
-  --db-host mariadb \
-  --db-type mariadb \
-  --db-root-username root \
-  --db-root-password 'YourStrongPassword123!' \
-  --admin-password  'YourAdminPassword456!' \
-  --mariadb-user-host-login-scope='%'
+~~~bash
+sudo docker compose exec -u root frappe chown -R frappe:frappe /workspace/bench
+~~~
 
-bench --site 192.168.1.100 install-app erpnext
-bench set-config -g default_site 192.168.1.100
-bench --site 192.168.1.100 set-config developer_mode 0
-bench --site 192.168.1.100 clear-cache
-```
+Do not delete volumes to solve a permission problem.
 
-Exit the container:
+### Works locally but not over the Internet
 
-```bash
-exit
-```
+Check public IP, host firewall, provider firewall/security group, and HTTP_PORT:
 
----
+~~~bash
+sudo docker compose ps
+sudo ufw status
+~~~
 
-## Step 9 — Build Frontend Assets
+Only Nginx should publish a host port.
 
-Frappe will compile bundles and link all static assets (including your Cephlon theme, logo, and styles).
+### Stale login or customized UI
 
-Run from the host server:
+Confirm hooks.py references and custom asset URLs return HTTP 200. Clear the site cache, restart Frappe, and reload the page. Increment the asset URL version after each custom CSS or JavaScript edit.
 
-```bash
-docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench build --app erpnext"
+### Nginx unhealthy
 
-docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench --site 192.168.1.100 clear-cache"
-```
+~~~bash
+sudo docker compose logs --tail=100 nginx
+sudo docker compose exec -T nginx nginx -t
+~~~
 
-> **How the build works:**
-> All your custom Cephlon assets (`cephlon-dashboard-panel.css`, `cephlon-dashboard-home.css`, `cephlon-erp-login.css`, `cephlon-logo.png`, etc.) are linked into `sites/assets/erpnext/` and cached for production. The `package.json` has been updated so it no longer attempts to trigger an external Vite banking build.
+## 12. Security and production notes
 
----
+This deployment exposes plain HTTP on port 3011, mounts editable source, uses mutable development versions, and starts Bench's development process. Use it for controlled development or an internal pilot with restricted firewall access.
 
-## Step 10 — Restart Frappe & Verify
+For an Internet-facing production system:
 
-```bash
-docker compose restart frappe
-docker compose logs -f frappe
-```
+- Add TLS and HTTPS.
+- Restrict access until TLS and access policies are ready.
+- Pin Frappe, ERPNext, and image versions to reviewed releases; develop and latest are not reproducible.
+- Use strong, unique database and Administrator passwords.
+- Keep .env and backups out of Git.
+- Configure automated off-server backups, monitoring, log retention, and tested restores.
+- Use a production process manager and review resource limits and firewall policy.
 
-You should see bench starting (web server on `:8000`, worker, socketio).
-
-Check with curl:
-
-```bash
-curl -I http://localhost:3011
-```
-
----
-
-## Step 11 — Open in Browser
-
-Open in your browser:
-
-```
-http://YOUR_SERVER_IP:3011
-```
-
-- **Username:** `Administrator`
-- **Password:** the `--admin-password` you set in Step 8
-
----
-
-## 🛠️ Quick Troubleshooting Guide
-
-For a full step-by-step resolution for **502 Bad Gateway** or connection issues, see [`fixes.md`](./fixes.md).
-
-### 1. `EACCES: permission denied, mkdir '/workspace/erpnext-source/node_modules'` or yarn error
-**Cause:** Host files mounted as root instead of user `frappe` (UID 1000).  
-**Fix:** Run on the server:
-```bash
-docker compose exec --user root frappe bash -c "chown -R frappe:frappe /workspace/bench /workspace/erpnext-source"
-```
-Or on the host:
-```bash
-sudo chown -R 1000:1000 /opt/cephlon/erpnext
-```
-
-### 2. `Procfile does not exist or is not a file`
-**Cause:** `bench start` executed before `bench init`.  
-**Fix:** `frappe-start.sh` now handles this automatically. Follow Steps 6–8 to complete `bench init`, then run `docker compose restart frappe`.
-
-### 3. `Permission denied: '/workspace/bench/apps'`
-**Cause:** `bench-data` volume owned by `root`.  
-**Fix:** 
-```bash
-docker compose exec --user root frappe bash -c "chown -R frappe:frappe /workspace/bench"
-```
-
-### 4. `ERROR: yarn build failed for erpnext` / `ENOENT: no such file or directory open '/sites/common_site_config.json'`
-**Cause:** ERPNext's `banking` subfolder runs Vite and looks for `/workspace/bench/sites/common_site_config.json`.  
-**Fix:** Create the missing file and build with `--skip-yarn`:
-```bash
-docker compose exec --user frappe -T frappe bash -lc \
-  "echo '{\"webserver_port\": 8000}' > /workspace/bench/sites/common_site_config.json && cd /workspace/bench && bench build --app erpnext --skip-yarn"
-```
-
----
-
-## Deploying Future Updates
-
-```bash
-cd /opt/cephlon/erpnext
-git pull origin main
-
-# Rebuild assets and clear cache (use --no-yarn to avoid banking/vite errors)
-docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench build --app erpnext --no-yarn && bench --site 192.168.1.100 clear-cache"
-
-# If Python/Doctype changes occurred:
-docker compose exec --user frappe -T frappe bash -lc \
-  "cd /workspace/bench && bench --site 192.168.1.100 migrate"
-
-docker compose restart frappe nginx
-```
+Never expose MariaDB or Redis ports publicly.

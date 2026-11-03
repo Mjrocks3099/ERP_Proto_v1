@@ -54,13 +54,13 @@ app_include_css = [
 	"/assets/erpnext/css/cephlon-dashboard-panel.css?v=16",
 	"/assets/erpnext/css/cephlon-dashboard-home.css?v=14",
 ]
-app_include_js = ["erpnext.bundle.js", "/assets/erpnext/js/cephlon-dashboard-home.js?v=17"]
+app_include_js = ["erpnext.bundle.js", "/assets/erpnext/js/cephlon-dashboard-home.js?v=18"]
 web_include_css = [
 	"erpnext-web.bundle.css",
 	"/assets/erpnext/css/cephlon-raleway.css?v=1",
-	"/assets/erpnext/css/cephlon-erp-login.css?v=6",
+	"/assets/erpnext/css/cephlon-erp-login.css?v=7",
 ]
-web_include_js = "/assets/erpnext/js/cephlon-erp-login.js?v=6"
+web_include_js = ["/assets/erpnext/js/cephlon-erp-login.js?v=7", "/assets/erpnext/js/cephlon-login.js?v=1"]
 email_css = "email_erpnext.bundle.css"
 
 app_include_icons = [

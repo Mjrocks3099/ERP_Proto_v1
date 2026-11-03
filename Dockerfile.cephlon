@@ -1,0 +1,4 @@
+FROM docker.io/frappe/bench:latest
+USER frappe
+WORKDIR /workspace/bench
+EXPOSE 8000-8005 9000-9005 6787

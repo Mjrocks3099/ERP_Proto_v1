@@ -62,7 +62,7 @@ services:
       - backend
       - edge
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8000 >/dev/null || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS -H 'Host: development.localhost' http://127.0.0.1:8000/ >/dev/null || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10

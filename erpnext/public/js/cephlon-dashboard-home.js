@@ -129,6 +129,7 @@
 		watchTutorialMediaDuringMount(main);
 		if (!isBannerRoute()) {
 			main.querySelector(".cephlon-home-banner")?.remove();
+			markUiReady();
 			return;
 		}
 

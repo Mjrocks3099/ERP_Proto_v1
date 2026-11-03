@@ -8,6 +8,58 @@ The Compose stack builds Frappe from Dockerfile.cephlon, runs MariaDB and Redis 
 
 > This is a development-oriented stack. It uses the Frappe develop branch, the mutable frappe/bench:latest image, editable source mounts, and plain HTTP. Restrict access with a firewall. Before sensitive production use, add TLS, pin versions, use a production process manager, and establish tested off-server backups.
 
+## Latest fixes: server startup and old UI
+
+Use this section when the server starts Docker but reports startup errors or still shows the stock ERPNext login or Desk. These fixes are for the current Compose configuration in this repository.
+
+### First make sure the server has the latest Git revision
+
+The server only receives files that have been committed and pushed to the branch it clones. Push the revision containing Dockerfile.cephlon, docker-compose.yml, nginx/default.conf, frappe-start.sh, erpnext/hooks.py, and the Cephlon assets before updating the server:
+
+~~~bash
+git pull
+sudo docker compose config
+~~~
+
+### Permission denied or bash: lc while starting frappe
+
+Older Compose commands tried to execute the shell script directly or passed a malformed login-shell option. Git checkouts may not mark frappe-start.sh executable. The current Compose command invokes it directly through Bash, so the executable bit and -lc wrapper are not needed. The resolved command should have two arguments: bash and /workspace/erpnext-source/frappe-start.sh.
+
+After pulling the current revision, recreate the Frappe container so Compose applies the command:
+
+~~~bash
+sudo docker compose up -d --build --force-recreate frappe
+sudo docker compose config
+sudo docker compose logs --tail=50 frappe
+~~~
+
+### Procfile not found on a fresh server
+
+This is expected before Bench is initialized. frappe-start.sh deliberately keeps the container alive while /workspace/bench/Procfile is absent. Complete sections 5 and 6 to initialize Bench, create the site, and install ERPNext. Restart Frappe after those steps finish. If Procfile is still missing afterward, Bench initialization did not complete; inspect the failed setup command and Frappe logs.
+
+### EACCES: permission denied, mkdir /workspace/erpnext-source/node_modules
+
+bench setup requirements installs JavaScript dependencies into the bind-mounted ERPNext checkout. The frappe container user must own those dependency folders. Run once before retrying requirements:
+
+~~~bash
+sudo docker compose exec -u root -T frappe bash -lc 'mkdir -p /workspace/erpnext-source/node_modules /workspace/erpnext-source/banking/node_modules && chown -R frappe:frappe /workspace/erpnext-source/node_modules /workspace/erpnext-source/banking/node_modules'
+sudo docker compose exec -T -w /workspace/bench frappe bench setup requirements
+~~~
+
+### Server displays the stock ERPNext login or Desk
+
+This usually means the deployed checkout is old, the Bench app symlink points to a different source tree, ERPNext is not installed on the site, or cached hooks have not been reloaded. After pushing the customized Git revision, run:
+
+~~~bash
+git pull
+sudo docker compose exec -T frappe readlink -f /workspace/bench/apps/erpnext
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost list-apps
+sudo docker compose exec -T frappe grep -n cephlon-dashboard-home.js /workspace/bench/apps/erpnext/hooks.py
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost clear-cache
+sudo docker compose restart frappe nginx
+~~~
+
+The app symlink should resolve to /workspace/erpnext-source, and list-apps should include erpnext. Confirm the login page includes Cephlon asset URLs and that they return HTTP 200. After changing a custom CSS or JavaScript file, increment its query-string version in hooks.py, clear the site cache, and restart Frappe. Reload the browser after the server is updated.
 ## 1. Server requirements
 
 Use Ubuntu 22.04 or 24.04 with:
@@ -353,7 +405,29 @@ Only Nginx should publish a host port.
 
 ### Stale login or customized UI
 
-Confirm hooks.py references and custom asset URLs return HTTP 200. Clear the site cache, restart Frappe, and reload the page. Increment the asset URL version after each custom CSS or JavaScript edit.
+An old Frappe or ERPNext screen usually means the server has an older Git revision, the Bench app symlink points elsewhere, or the site cache has not been refreshed. From the server repository directory, update the checkout and inspect the installed app and source link:
+
+~~~bash
+git pull
+sudo docker compose exec -T frappe readlink -f /workspace/bench/apps/erpnext
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost list-apps
+sudo docker compose exec -T frappe grep -n cephlon-dashboard-home.js /workspace/bench/apps/erpnext/hooks.py
+~~~
+
+The symlink should resolve to /workspace/erpnext-source, and list-apps should include erpnext. The current hooks.py should reference the Cephlon login and Desk assets with their version query strings. If the link points somewhere else and apps/erpnext is already a symlink, update it:
+
+~~~bash
+sudo docker compose exec -u root -T frappe bash -lc 'test -L /workspace/bench/apps/erpnext && ln -sfn /workspace/erpnext-source /workspace/bench/apps/erpnext'
+~~~
+
+Then clear cache and restart Frappe so it reloads hooks.py:
+
+~~~bash
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost clear-cache
+sudo docker compose restart frappe nginx
+~~~
+
+Confirm the login HTML includes the Cephlon asset links and that those URLs return HTTP 200. After changing a custom CSS or JavaScript file, increment its URL version in hooks.py. Reload the browser after the server is updated.
 
 ### Nginx unhealthy
 

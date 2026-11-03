@@ -159,6 +159,22 @@ Wait until frappe and nginx show healthy. The startup log should say Procfile re
 
 ## Step 7: verify each asset from the server
 
+Before testing URLs, check the generated public-assets link. Frappe serves files from sites/assets; the link must resolve to the ERPNext public directory:
+
+~~~bash
+sudo docker compose exec -T frappe readlink -f /workspace/bench/sites/assets/erpnext
+~~~
+
+Expected target: /workspace/erpnext-source/erpnext/public. A 404 for every custom asset usually means this link is missing or points to the wrong directory, even when the source files exist.
+
+If the link is missing or is a symlink to the wrong target, recreate it as the frappe user:
+
+~~~bash
+sudo docker compose exec -T frappe bash -lc 'asset_link=/workspace/bench/sites/assets/erpnext; target=/workspace/erpnext-source/erpnext/public; mkdir -p /workspace/bench/sites/assets; if [ -L "$asset_link" ] || [ ! -e "$asset_link" ]; then ln -sfn "$target" "$asset_link"; else echo "Asset path exists as a real directory; inspect it before replacing it." >&2; exit 1; fi'
+sudo docker compose exec -T -w /workspace/bench frappe bench --site development.localhost clear-cache
+sudo docker compose restart frappe nginx
+~~~
+
 Run from the server host. Every command should return HTTP 200:
 
 ~~~bash
@@ -225,7 +241,7 @@ Use the Step 4 ownership command, then retry bench setup requirements.
 
 ### Assets return 404
 
-Confirm the paths in hooks.py match the actual files under erpnext/public. Clear cache and restart Frappe after correcting the deployed revision.
+A 404 means Frappe cannot find the requested path under sites/assets. Check that /workspace/bench/sites/assets/erpnext resolves to /workspace/erpnext-source/erpnext/public, that the named file exists under erpnext/public, and that hooks.py uses the same filename. If the source file exists but the assets link is missing, use the repair command in Step 7, then clear cache and restart.
 
 ### Nginx is unreachable from outside
 

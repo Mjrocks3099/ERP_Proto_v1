@@ -74,13 +74,16 @@
 		if (main.dataset.cephlonTutorialWatch === "active") return;
 
 		main.dataset.cephlonTutorialWatch = "active";
-		const observer = new MutationObserver(() => hideErpnextTutorials(main));
+		const observer = new MutationObserver(() => {
+			replaceVisibleErpnextText(main);
+			hideErpnextTutorials(main);
+		});
 		observer.observe(main, { childList: true, subtree: true });
 
 		window.setTimeout(() => {
 			observer.disconnect();
 			delete main.dataset.cephlonTutorialWatch;
-		}, 4000);
+		}, 10000);
 	};
 
 	const replaceFrappeBranding = () => {
@@ -117,8 +120,22 @@
 
 		const main = document.querySelector(".layout-main-section");
 		if (!main) {
-			/* /desk is the app launcher and has no workspace main section. */
-			markUiReady();
+			/* Keep Desk routes covered until Frappe mounts their workspace. */
+			const path = window.location.pathname.replace(/\/+$/, "");
+			if (path === "/desk" || path === "/app") {
+				markUiReady();
+				return;
+			}
+			if (!mainMountObserver && document.body) {
+				mainMountObserver = new MutationObserver(() => {
+					if (!document.querySelector(".layout-main-section")) return;
+					mainMountObserver.disconnect();
+					mainMountObserver = null;
+					retryCount = 0;
+					scheduleRender();
+				});
+				mainMountObserver.observe(document.body, { childList: true, subtree: true });
+			}
 			return;
 		}
 
